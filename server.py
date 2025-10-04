@@ -17,6 +17,22 @@ def init_db():
     )
     """)
 
+    # Expenses Table
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS expenses (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      title TEXT,
+      description TEXT NOT NULL,
+      amount TEXT NOT NULL,
+      date TEXT NOT NULL,
+      category TEXT NOT NULL,
+      user_id INTEGER,
+      FOREIGN KEY(user_id) REFERENCES users(id)
+    )
+    """)
+
+
     conn.commit() # Save changes to the dabase
     conn.close() # Close the connection to the database.
 
@@ -59,6 +75,9 @@ def get_user(user_id):
     cursor.execute("SELECT * FROM users WHERE id=?", (user_id,))
     row = cursor.fetchone()
     conn.close()
+
+    if not row:
+        return jsonify({"message": "User not found"}), 404
 
     return jsonify({"id": row["id"], "username": row["username"]}), 200
 
@@ -105,8 +124,9 @@ def delete_user(user_id):
 
 
 @app.get("/api/users")
-def get_user():
+def get_all_users():
     conn = sqlite3.connect(DB_NAME)
+    conn.row_factory =sqlite3.Row
     cursor = conn.cursor()
 
     cursor.execute("SELECT * FROM users")
@@ -116,10 +136,16 @@ def get_user():
 
     users = []
     for row in rows:
-        user = {"id": row["id"], "username": row["username"], "password": row["password"]}
-        users.append(user)
+      user = {
+        "id": row["id"],
+        "username": row["username"],
+        "password": row["password"]
+    }
+    users.append(user)
     
     return jsonify(users), 200
+
+
 
 if __name__ == "__main__":
     init_db()
