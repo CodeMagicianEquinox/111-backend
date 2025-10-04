@@ -1,5 +1,6 @@
 from flask import Flask, jsonify, request
 import sqlite3
+from datetime import date
 
 app = Flask(__name__)
 
@@ -145,7 +146,29 @@ def get_all_users():
     
     return jsonify(users), 200
 
+# ----------| EXPENSES |----------
+@app.post("/api/expenses")
+def create_expense():
+    data = request.get_json()
+    title = data.get("title")
+    description = data.get("description")
+    amount = data.get("amount")
+    category = data.get("category")
+    user_id = data.get("user_id")
+    date_str = data.get("date")
 
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+
+    cursor.execute("""
+      INSERT INTO expenses (title, description, amount, date, category, user_id) 
+      VALUES (?, ?, ?, ?, ?, ?)
+      """, (title, description, amount, date_str, category, user_id))
+    
+    conn.commit()
+    conn.close()
+
+    return jsonify({"message": "Expense added successfully"}), 201
 
 if __name__ == "__main__":
     init_db()
