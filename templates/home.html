@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}Home{% endblock title %}
+
+{% block content %}
+
+  <h2>Welcome, {{ username }}!</h2>
+
+  <h3>Your Expenses:</h3>
+
+  <ul>
+    {% for expense in expenses %}
+      <li>
+
+        <h4>{{ expense.title }}</h4>
+
+        Amount: ${{ expense.amount }} on <span class="text-secondary">{{ expense.date }}</span> <br>
+
+        Category: {{ expense.category }}
+        <br>
+        Description: {{ expense.description }}
+
+      </li>
+    {% else %}
+
+      <li>No expenses found.</li>
+
+    {% endfor %}
+
+  </ul>
+
+{% endblock content %}

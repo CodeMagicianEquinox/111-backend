@@ -1,0 +1,4 @@
+--- To start virtual environment ---
+python -m venv venv
+
+
